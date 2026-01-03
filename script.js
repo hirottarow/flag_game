@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
         score: 0,
         isAnswering: false, // Lock to prevent double clicking
         totalQuestions: 10,
-        difficulty: 'normal' // easy, normal, hard, all
+        difficulty: 'normal', // easy, normal, hard, all
+        mode: 'name' // name (find country name), flag (find flag)
     };
 
     // --- Country Categorization ---
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const elements = {
+        modeBtns: document.querySelectorAll('.mode-btn'), // New
         diffBtns: document.querySelectorAll('.diff-btn'), // New
         restartBtn: document.getElementById('restart-btn'),
         scoreVal: document.getElementById('score-value'),
@@ -37,7 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
         optionsContainer: document.getElementById('options-container'),
         finalScore: document.getElementById('final-score'),
         resultMsg: document.getElementById('result-message'),
-        resetBtn: document.getElementById('reset-btn')
+        resetBtn: document.getElementById('reset-btn'),
+        quizPanel: document.querySelector('.quiz-panel')
     };
 
     // --- API & Initialization ---
@@ -122,19 +125,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const showQuestion = () => {
         state.isAnswering = false; // Unlock inputs
         const targetCountry = state.quizQueue[state.currentQuestionIndex];
+        const jpnName = targetCountry.translations?.jpn?.common || targetCountry.name.common;
 
         // Update UI
         elements.currentQ.textContent = state.currentQuestionIndex + 1;
 
-        // Load Flag
-        elements.flagImg.classList.add('hidden');
-        elements.flagLoader.style.display = 'block';
+        if (state.mode === 'name') {
+            // Mode: Name Quiz (Flag -> Names)
+            elements.quizPanel.classList.add('mode-name');
+            elements.quizPanel.classList.remove('mode-flag');
+            elements.flagImg.parentElement.style.display = 'flex';
+            elements.questionText = document.querySelector('.question-text');
+            elements.questionText.textContent = "この国旗はどこの国？";
 
-        elements.flagImg.onload = () => {
-            elements.flagLoader.style.display = 'none';
-            elements.flagImg.classList.remove('hidden');
-        };
-        elements.flagImg.src = targetCountry.flags.svg;
+            // Load Flag
+            elements.flagImg.classList.add('hidden');
+            elements.flagLoader.style.display = 'block';
+            elements.flagImg.onload = () => {
+                elements.flagLoader.style.display = 'none';
+                elements.flagImg.classList.remove('hidden');
+            };
+            elements.flagImg.src = targetCountry.flags.svg;
+
+        } else {
+            // Mode: Flag Quiz (Name -> Flags)
+            elements.quizPanel.classList.add('mode-flag');
+            elements.quizPanel.classList.remove('mode-name');
+            elements.flagImg.parentElement.style.display = 'none';
+            elements.questionText = document.querySelector('.question-text');
+            elements.questionText.innerHTML = `<span style="color:var(--accent-glow); font-size: 1.5rem; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 4px;">${jpnName}</span> の国旗はどれ？`;
+        }
 
         // Generate Options (1 correct + 3 wrong)
         const wrongOptions = getWrongOptions(targetCountry, 3);
@@ -142,21 +162,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Render Buttons
         elements.optionsContainer.innerHTML = '';
-        options.forEach(country => {
+        options.forEach((country, idx) => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
-            // Try to get Japanese name, fallback to common English name
-            const label = country.translations?.jpn?.common || country.name.common;
-            btn.textContent = label;
 
-            // Adjust font size for long country names
-            if (label.length > 10) {
-                btn.style.fontSize = '0.9rem';
-            }
-            if (label.length > 20) {
-                btn.style.fontSize = '0.75rem';
+            // Create Number Badge
+            const numBadge = document.createElement('span');
+            numBadge.className = 'option-number';
+            numBadge.textContent = idx + 1;
+            btn.appendChild(numBadge);
+
+            if (state.mode === 'name') {
+                const labelContainer = document.createElement('span');
+                labelContainer.className = 'option-label-text';
+                const label = country.translations?.jpn?.common || country.name.common;
+                labelContainer.textContent = label;
+                btn.appendChild(labelContainer);
+
+                // Adjust font size for long country names
+                if (label.length > 10) btn.style.fontSize = '0.9rem';
+                if (label.length > 20) btn.style.fontSize = '0.75rem';
+            } else {
+                // Show flag inside button
+                const img = document.createElement('img');
+                img.src = country.flags.svg;
+                img.className = 'option-flag';
+                btn.appendChild(img);
             }
 
+            btn.setAttribute('data-cca3', country.cca3);
             btn.onclick = () => handleAnswer(country, targetCountry, btn);
             elements.optionsContainer.appendChild(btn);
         });
@@ -189,9 +223,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             btnElement.classList.add('incorrect');
             // Highlight the correct one
-            const buttons = elements.optionsContainer.querySelectorAll('button');
+            const buttons = elements.optionsContainer.querySelectorAll('.option-btn');
             buttons.forEach(b => {
-                if (b.textContent === (correct.translations?.jpn?.common || correct.name.common)) {
+                if (b.getAttribute('data-cca3') === correct.cca3) {
                     b.classList.add('correct');
                 }
             });
@@ -251,6 +285,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Event Listeners ---
+    elements.modeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            elements.modeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.mode = btn.getAttribute('data-mode');
+        });
+    });
+
     elements.diffBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const diff = btn.getAttribute('data-difficulty');
