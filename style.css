@@ -161,23 +161,27 @@ h1 {
     background: rgba(30, 41, 59, 0.7);
     border: 1px solid var(--glass-border);
     color: var(--text-primary);
-    padding: 12px;
+    padding: 16px 12px;
+    /* Increased padding */
     border-radius: 12px;
     font-family: var(--font-body);
-    font-size: 1rem;
+    font-size: 1.1rem;
+    /* Slightly larger font */
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mode-btn:hover {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(59, 130, 246, 0.2);
+    transform: translateY(-2px);
 }
 
 .mode-btn.active {
     background: var(--accent-color);
     border-color: var(--accent-glow);
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+    transform: scale(1.02);
 }
 
 /* Difficulty Selection */
