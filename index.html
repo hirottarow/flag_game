@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Flag Quiz - 世界の国旗クイズ</title>
+    <meta name="description" content="世界の国旗を当てる4択クイズゲーム。あなたの知識を試そう！">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="background-animation"></div>
+
+    <main class="app-container">
+        <!-- Start Screen -->
+        <section id="start-screen" class="screen active">
+            <div class="glass-panel">
+                <div class="logo-area">
+                    <div class="globe-icon">🌍</div>
+                    <h1>World Flag Quiz</h1>
+                    <p class="subtitle">世界の国旗、いくつわかる？</p>
+                </div>
+                <div class="difficulty-selection">
+                    <p class="selection-label">難易度を選択してください</p>
+                    <div class="difficulty-grid">
+                        <button class="diff-btn easy" data-difficulty="easy">
+                            <span class="btn-text">やさしい</span>
+                        </button>
+                        <button class="diff-btn normal" data-difficulty="normal">
+                            <span class="btn-text">ふつう</span>
+                        </button>
+                        <button class="diff-btn hard" data-difficulty="hard">
+                            <span class="btn-text">むずかしい</span>
+                        </button>
+                        <button class="diff-btn all" data-difficulty="all">
+                            <span class="btn-text">オール</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Quiz Screen -->
+        <section id="quiz-screen" class="screen hidden">
+            <div class="game-header">
+                <div class="header-left">
+                    <div class="score-pill">
+                        <span class="label">SCORE</span>
+                        <span id="score-value" class="value">0</span>
+                    </div>
+                </div>
+                <div class="header-center">
+                    <button id="reset-btn" class="reset-icon-btn" title="タイトルに戻る">
+                        <span class="icon">🔄</span>
+                    </button>
+                </div>
+                <div class="header-right">
+                    <div class="progress-pill">
+                        <span id="current-question">1</span> / <span id="total-questions">10</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel quiz-panel">
+                <div class="flag-container">
+                    <div class="loading-spinner" id="flag-loader"></div>
+                    <img id="flag-image" src="" alt="Flag" class="flag-img hidden">
+                </div>
+
+                <h2 class="question-text">この国旗はどこの国？</h2>
+
+                <div class="options-grid" id="options-container">
+                    <!-- Options will be injected here -->
+                    <button class="option-btn">Option 1</button>
+                    <button class="option-btn">Option 2</button>
+                    <button class="option-btn">Option 3</button>
+                    <button class="option-btn">Option 4</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Result Screen -->
+        <section id="result-screen" class="screen hidden">
+            <div class="glass-panel result-panel">
+                <h2 class="result-title">RESULT</h2>
+
+                <div class="score-display">
+                    <span class="score-number" id="final-score">0</span>
+                    <span class="score-total">/ 10</span>
+                </div>
+
+                <p id="result-message" class="result-message">Nice Try!</p>
+
+                <div class="action-buttons">
+                    <button id="restart-btn" class="primary-btn">
+                        <span class="btn-text">PLAY AGAIN</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>Powered by <a href="https://restcountries.com" target="_blank">RestCountries API</a></p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
